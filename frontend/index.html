@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA 2026 | Ultimate Simulator & Insights</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-background"></div>
+    
+    <nav class="glass-nav">
+        <div class="logo">FIFA 2026 <span>PRO</span></div>
+        <div class="nav-links">
+            <button onclick="showView('simulator')" class="nav-btn active" id="sim-btn">Simulator</button>
+            <button onclick="showView('insights')" class="nav-btn" id="ins-btn">Insights</button>
+        </div>
+    </nav>
+
+    <main id="simulator-view" class="active-view">
+        <section class="hero glass-card">
+            <h1>Predict the <span>Champion</span></h1>
+            <p>Experience the first-ever 48-team World Cup simulation using advanced Logistic Regression.</p>
+            <button id="run-sim" class="primary-btn">Begin Simulation</button>
+        </section>
+
+        <section id="results-container" class="hidden">
+            <div class="section-title">Group Stage Results</div>
+            <div id="group-grid" class="group-grid"></div>
+
+            <div class="section-title">The Road to the Final</div>
+            
+            <!-- Winner Banner -->
+            <div id="winner-banner" class="winner-banner hidden">
+                <div class="trophy">🏆</div>
+                <h2>World Champion</h2>
+                <div id="winner-flag"></div>
+                <div id="winner-name" class="winner-name"></div>
+            </div>
+
+            <div id="bracket-container" class="bracket-wrapper">
+                <!-- Round Labels -->
+                <div class="round-labels">
+                    <span>Round of 32</span>
+                    <span>Round of 16</span>
+                    <span>Quarter Finals</span>
+                    <span>Semi Finals</span>
+                    <span>FINAL</span>
+                    <span>Semi Finals</span>
+                    <span>Quarter Finals</span>
+                    <span>Round of 16</span>
+                    <span>Round of 32</span>
+                </div>
+                
+                <!-- Bracket Body -->
+                <div class="bracket-body">
+                    <!-- LEFT HALF -->
+                    <div class="bracket-half left-half">
+                        <div class="round" id="left-r32"></div>
+                        <div class="round" id="left-r16"></div>
+                        <div class="round" id="left-qf"></div>
+                        <div class="round" id="left-sf"></div>
+                    </div>
+                    
+                    <!-- CENTER FINAL -->
+                    <div class="bracket-final">
+                        <div class="round" id="final-match"></div>
+                    </div>
+                    
+                    <!-- RIGHT HALF -->
+                    <div class="bracket-half right-half">
+                        <div class="round" id="right-sf"></div>
+                        <div class="round" id="right-qf"></div>
+                        <div class="round" id="right-r16"></div>
+                        <div class="round" id="right-r32"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <main id="insights-view" class="hidden">
+        <section class="hero glass-card">
+            <h1>Data <span>Analytics</span></h1>
+            <p>Deep dive into team performance, offensive ratings, and FIFA ranking trends.</p>
+        </section>
+        <section class="hero glass-card h2h-section" style="margin-top: 2rem; padding: 2rem; text-align: center;">
+            <h2>Interactive <span>Head-to-Head</span> Predictor</h2>
+            <p style="margin-bottom: 2rem;">Select two teams to analyze their matchup and win probabilities based on our ML model.</p>
+            
+            <div class="h2h-container">
+                <div class="h2h-selector">
+                    <div class="team-select-group">
+                        <select id="h2h-team1" class="glass-select"></select>
+                    </div>
+                    <div class="vs-badge">VS</div>
+                    <div class="team-select-group">
+                        <select id="h2h-team2" class="glass-select"></select>
+                    </div>
+                </div>
+                <button id="h2h-predict-btn" class="primary-btn" style="margin-top: 1.5rem;">Analyze Matchup</button>
+            </div>
+            
+            <div id="h2h-result" class="h2h-result hidden glass-card" style="margin-top: 2rem; padding: 2rem;">
+                <div class="h2h-flags">
+                    <div id="h2h-flag1" class="flag-wrapper"></div>
+                    <div class="h2h-prob-bar-container">
+                        <div class="prob-labels">
+                            <span id="h2h-prob-lbl1">50%</span>
+                            <span id="h2h-prob-lbl2">50%</span>
+                        </div>
+                        <div class="prob-bar-bg">
+                            <div id="h2h-prob-bar" class="prob-bar-fill"></div>
+                        </div>
+                    </div>
+                    <div id="h2h-flag2" class="flag-wrapper"></div>
+                </div>
+                
+                <div class="h2h-stats">
+                    <div class="stat-column">
+                        <h3 id="h2h-name1" class="team-name" style="color: #2c52ed;">Team 1</h3>
+                        <div class="stat-row"><span>FIFA Rank</span> <strong id="h2h-rank1">--</strong></div>
+                        <div class="stat-row"><span>Offensive Rating</span> <strong id="h2h-off1">--</strong></div>
+                        <div class="stat-row"><span>Defensive Rating</span> <strong id="h2h-def1">--</strong></div>
+                        <div class="stat-row"><span>Midfield Rating</span> <strong id="h2h-mid1">--</strong></div>
+                    </div>
+                    <div class="stat-column text-right" style="text-align: right;">
+                        <h3 id="h2h-name2" class="team-name" style="color: #ff4d4d;">Team 2</h3>
+                        <div class="stat-row"><strong id="h2h-rank2">--</strong> <span>FIFA Rank</span></div>
+                        <div class="stat-row"><strong id="h2h-off2">--</strong> <span>Offensive Rating</span></div>
+                        <div class="stat-row"><strong id="h2h-def2">--</strong> <span>Defensive Rating</span></div>
+                        <div class="stat-row"><strong id="h2h-mid2">--</strong> <span>Midfield Rating</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="insights-grid" style="margin-top: 4rem; grid-template-columns: 1fr;">
+            <div class="glass-card chart-container">
+                <h3>Global Rankings</h3>
+                <canvas id="rankingsChart"></canvas>
+            </div>
+            <div class="glass-card chart-container">
+                <h3>Midfield Dominance</h3>
+                <canvas id="midfieldChart"></canvas>
+            </div>
+            <div class="glass-card chart-container">
+                <h3>Offensive vs Defensive Power</h3>
+                <canvas id="powerChart"></canvas>
+            </div>
+        </div>
+
+        <section class="hero glass-card" style="margin-top: 4rem; padding: 2rem;">
+            <h2>Simulation <span>Results</span></h2>
+            <p>Live metrics from your latest simulation run.</p>
+        </section>
+
+        <div class="insights-grid" id="sim-insights-grid" style="display: none; grid-template-columns: 1fr;">
+            <div class="glass-card chart-container">
+                <h3>Top Performers: Group Stage Points</h3>
+                <canvas id="simPointsChart"></canvas>
+            </div>
+            <div class="glass-card chart-container">
+                <h3>Most Dominant: Goal Difference</h3>
+                <canvas id="simGDChart"></canvas>
+            </div>
+            <div class="glass-card chart-container">
+                <h3>Iron Defense: Least Goals Conceded</h3>
+                <canvas id="simGCChart"></canvas>
+            </div>
+        </div>
+        
+        <div id="sim-insights-placeholder" style="text-align: center; color: var(--text-dim); padding: 2rem;">
+            <p>Please run the Simulator first to see tournament statistics.</p>
+        </div>
+    </main>
+
+    <div id="loading" class="loading hidden">
+        <div class="loader"></div>
+        <p>Crunching match data...</p>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
